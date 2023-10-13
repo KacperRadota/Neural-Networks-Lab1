@@ -1,5 +1,7 @@
-import pandas.core.frame
+from dataset import get_dataframes
 
 
-def preprocess_heart_diseases(df: pandas.core.frame.DataFrame):
-    return df.drop(['ca', 'thal'], axis=1)
+# noinspection PyPep8Naming
+def get_preprocessed_datasets():
+    X, y = get_dataframes()
+    return X.drop(['ca', 'thal'], axis=1), y
