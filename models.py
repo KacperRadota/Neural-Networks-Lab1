@@ -3,6 +3,15 @@ import numpy as np
 import pandas.core.frame
 
 
+class NeuralNetwork:
+    def __init__(self, input_dim, hidden_dim, output_dim, num_hidden_layers):
+        self.layers = []
+        self.layers.append(HiddenLayer(input_dim, hidden_dim))
+        for i in range(num_hidden_layers):
+            self.layers.append(HiddenLayer(hidden_dim, hidden_dim))
+        self.layers.append(HiddenLayer(hidden_dim, output_dim))
+
+
 class HiddenLayer:
     def __init__(self, num_of_inputs, num_of_neurons):
         self.output = None
