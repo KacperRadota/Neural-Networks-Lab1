@@ -7,9 +7,17 @@ class NeuralNetwork:
     def __init__(self, input_dim, hidden_dim, output_dim, num_hidden_layers):
         self.layers = []
         self.layers.append(HiddenLayer(input_dim, hidden_dim))
-        for i in range(num_hidden_layers):
+        for _ in range(num_hidden_layers):
             self.layers.append(HiddenLayer(hidden_dim, hidden_dim))
         self.layers.append(HiddenLayer(hidden_dim, output_dim))
+        self.activations = []
+        self.activations.append(-1)  # First index as input layer so no activation function
+        for _ in range(len(self.layers) - 2):
+            self.activations.append(ActivationReLU())
+        self.activations.append(ActivationSoftmax())
+
+    def forward(self):
+        pass
 
 
 class HiddenLayer:
