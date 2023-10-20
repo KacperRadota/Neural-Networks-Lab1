@@ -1,10 +1,12 @@
 # Module with neural network implementations
+import preprocess
 import numpy as np
 import pandas.core.frame
 
 
 class NeuralNetwork:
     def __init__(self, input_dim, hidden_dim, output_dim, num_hidden_layers):
+        self.output = None
         self.layers = []
         self.layers.append(HiddenLayer(input_dim, hidden_dim))
         for _ in range(num_hidden_layers):
@@ -16,8 +18,30 @@ class NeuralNetwork:
             self.activations.append(ActivationReLU())
         self.activations.append(ActivationSoftmax())
 
-    def forward(self):
+    def forward(self, inputs):
+        prev_output = None
+        for i, layer in enumerate(self.layers):
+            if i == 0:
+                layer.forward(inputs)
+                prev_output = layer.output
+                continue
+            layer.forward(prev_output)
+            self.activations[i].forward(layer.output)
+            prev_output = self.activations[i].output
+        self.output = prev_output
+
+    def backward(self):
         pass
+
+
+class InputLayer:
+    def __init__(self, num_of_inputs, num_of_neurons):
+        self.output = None
+        self.num_of_inputs = num_of_inputs
+        self.num_of_neurons = num_of_neurons
+
+    def forward(self, inputs):
+        self.output = inputs
 
 
 class HiddenLayer:
@@ -30,17 +54,25 @@ class HiddenLayer:
         self.output = np.dot(inputs, self.weights) + self.biases
 
 
-class ActivationReLU:  # Other gradient and derivatives calculations than sigmoid
+class ActivationFunction:
     def __init__(self):
         self.output = None
+
+    def forward(self, inputs):
+        pass
+
+
+class ActivationReLU(ActivationFunction):  # Other gradient and derivatives calculations than sigmoid
+    def __init__(self):
+        super().__init__()
 
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
 
-class ActivationSoftmax:  # Depends on what we want to achieve - good for 1 of k classes
+class ActivationSoftmax(ActivationFunction):  # Depends on what we want to achieve - good for 1 of k classes
     def __init__(self):
-        self.output = None
+        super().__init__()
 
     def forward(self, inputs):
         exponential_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
@@ -67,3 +99,14 @@ class LossCategoricalCrossEntropy(Loss):
         else:
             correct_confidences = np.sum(y_pred_clipped * y_true, axis=1)
         return -np.log(correct_confidences)
+
+
+def run():
+    X, y = preprocess.get_preprocessed_datasets()
+    nn = NeuralNetwork(11, 10, 4, 2)
+    nn.forward(X)
+    print(nn.output)
+
+
+if __name__ == "__main__":
+    run()
