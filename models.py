@@ -7,6 +7,8 @@ import pandas.core.frame
 class NeuralNetwork:
     def __init__(self, input_dim, hidden_dim, output_dim, num_hidden_layers):
         self.output = None
+        self.loss = None
+        self.accuracy = None
         self.layers = []
         self.layers.append(HiddenLayer(input_dim, hidden_dim))
         for _ in range(num_hidden_layers):
@@ -16,12 +18,19 @@ class NeuralNetwork:
         self.activations.append(-1)  # First index as input layer so no activation function
         for _ in range(len(self.layers) - 2):
             self.activations.append(ActivationReLU())
-        self.activations.append(ActivationSoftmax())
+        self.activations.append(ActivationSoftmaxXLossCategoricalCrossEntropy())
 
-    def forward(self, inputs):
+    def forward(self, inputs, y_true):
         prev_output = None
         for i, layer in enumerate(self.layers):
-            if i == 0:
+            if i == (len(self.layers) - 1):  # Softmax and loss function case
+                self.loss = self.activations[i].forward(prev_output, y_true)
+                predictions = np.argmax(self.activations[i].output, axis=1)
+                if len(y_true.shape) == 2:
+                    y_true = np.argmax(y_true, axis=1)
+                self.accuracy = np.mean(predictions == y_true)
+                break
+            if i == 0:  # Input layer case
                 layer.forward(inputs)
                 prev_output = layer.output
                 continue
@@ -101,16 +110,26 @@ class ActivationSoftmax(ActivationFunction):  # Depends on what we want to achie
         self.output = probabilities
 
     def backward(self, dvalues):
-        pass
+        self.dinputs = np.empty_like(dvalues)
+        for i, (single_output, single_dvalue) in enumerate(zip(self.output, dvalues)):
+            single_output = single_output.reshape(-1, 1)
+            jacobian_matrix = np.diagflat(single_output) - np.dot(single_output, single_output.T)
+            self.dinputs[i] = np.dot(jacobian_matrix, single_dvalue)
 
 
 class Loss:
+    def __init__(self):
+        self.dinputs = None
+
     def calculate(self, output, y):
         sample_losses = self.forward(output, y)
         data_loss = np.mean(sample_losses)
         return data_loss
 
     def forward(self, y_pred, y_true) -> pandas.core.frame.DataFrame:
+        pass
+
+    def backward(self, dvalues, y_true):
         pass
 
 
@@ -124,12 +143,44 @@ class LossCategoricalCrossEntropy(Loss):
             correct_confidences = np.sum(y_pred_clipped * y_true, axis=1)
         return -np.log(correct_confidences)
 
+    def backward(self, dvalues, y_true):
+        # When labels are sparse -> one-hot vector
+        if len(y_true.shape) == 1:
+            labels = len(dvalues[0])
+            y_true = np.eye(labels)[y_true]
+        samples = len(dvalues)
+        self.dinputs = -y_true / dvalues
+        self.dinputs = self.dinputs / samples
+
+
+# Created like that for faster computations than softmax and loss separately
+class ActivationSoftmaxXLossCategoricalCrossEntropy:
+    def __init__(self):
+        self.dinputs = None
+        self.output = None
+        self.activation = ActivationSoftmax()
+        self.loss = LossCategoricalCrossEntropy()
+
+    def forward(self, inputs, y_true) -> pandas.core.frame.DataFrame:
+        self.activation.forward(inputs)
+        self.output = self.activation.output
+        return self.loss.calculate(self.output, y_true)
+
+    def backward(self, dvalues, y_true):
+        samples = len(dvalues)
+        # If labels are one-hot -> discrete values
+        if len(y_true.shape) == 2:
+            y_true = np.argmax(y_true, axis=1)
+        self.dinputs = dvalues.copy()
+        self.dinputs[range(samples), y_true] -= 1
+        self.dinputs = self.dinputs / samples
+
 
 # noinspection PyPep8Naming
 def run():
     X, y = preprocess.get_preprocessed_datasets()
     nn = NeuralNetwork(11, 10, 5, 2)
-    nn.forward(X)
+    nn.forward(X, y)
     print(nn.output)
 
 
