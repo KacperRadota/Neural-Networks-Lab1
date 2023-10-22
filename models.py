@@ -46,19 +46,34 @@ class InputLayer:
 
 class HiddenLayer:
     def __init__(self, num_of_inputs, num_of_neurons):
+        self.inputs = None
         self.output = None
+        self.dweights = None
+        self.dbiases = None
+        self.dinputs = None
         self.weights = 0.01 * np.random.randn(num_of_inputs, num_of_neurons)  # Uniform distribution
         self.biases = np.zeros((1, num_of_neurons))
 
     def forward(self, inputs):
+        self.inputs = inputs
         self.output = np.dot(inputs, self.weights) + self.biases
+
+    def backward(self, dvalues):
+        self.dweights = np.dot(self.inputs.T, dvalues)
+        self.dbiases = np.sum(dvalues, axis=0, keepdims=True)
+        self.dinputs = np.dot(dvalues, self.weights.T)
 
 
 class ActivationFunction:
     def __init__(self):
+        self.inputs = None
         self.output = None
+        self.dinputs = None
 
     def forward(self, inputs):
+        pass
+
+    def backward(self, dvalues):
         pass
 
 
@@ -67,7 +82,12 @@ class ActivationReLU(ActivationFunction):  # Other gradient and derivatives calc
         super().__init__()
 
     def forward(self, inputs):
+        self.inputs = inputs
         self.output = np.maximum(0, inputs)
+
+    def backward(self, dvalues):
+        self.dinputs = dvalues.copy()
+        self.dinputs[self.inputs <= 0] = 0
 
 
 class ActivationSoftmax(ActivationFunction):  # Depends on what we want to achieve - good for 1 of k classes
@@ -75,9 +95,13 @@ class ActivationSoftmax(ActivationFunction):  # Depends on what we want to achie
         super().__init__()
 
     def forward(self, inputs):
+        self.inputs = inputs
         exponential_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
         probabilities = exponential_values / np.sum(exponential_values, axis=1, keepdims=True)
         self.output = probabilities
+
+    def backward(self, dvalues):
+        pass
 
 
 class Loss:
@@ -101,9 +125,10 @@ class LossCategoricalCrossEntropy(Loss):
         return -np.log(correct_confidences)
 
 
+# noinspection PyPep8Naming
 def run():
     X, y = preprocess.get_preprocessed_datasets()
-    nn = NeuralNetwork(11, 10, 4, 2)
+    nn = NeuralNetwork(11, 10, 5, 2)
     nn.forward(X)
     print(nn.output)
 
