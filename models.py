@@ -19,6 +19,7 @@ class NeuralNetwork:
         for _ in range(len(self.layers) - 2):
             self.activations.append(ActivationReLU())
         self.activations.append(ActivationSoftmaxXLossCategoricalCrossEntropy())
+        self.optimizer = Optimizer()
 
     def forward(self, inputs, y_true):
         prev_output = None
@@ -174,6 +175,15 @@ class ActivationSoftmaxXLossCategoricalCrossEntropy:
         self.dinputs = dvalues.copy()
         self.dinputs[range(samples), y_true] -= 1
         self.dinputs = self.dinputs / samples
+
+
+class Optimizer:
+    def __init__(self, learning_rate=1.0):
+        self.learning_rate = learning_rate
+
+    def update_params(self, layer: HiddenLayer):
+        layer.weights += -self.learning_rate * layer.dweights
+        layer.biases += -self.learning_rate * layer.dbiases
 
 
 # noinspection PyPep8Naming
