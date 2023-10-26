@@ -16,8 +16,10 @@ def train_heart_disease(batch_size=40):
 # noinspection PyPep8Naming
 def train_wine_quality():
     X_train, X_test, y_train, y_test = get_train_and_test_datasets_wine_quality()
-    nn = NeuralNetwork(11, 64, 1, 2, "R", decay=5e-7, learning_rate=0.005)
-    nn.train(X_train, y_train, epochs=1000, batch_size=128, print_every=100, validation_data=(X_test, y_test))
+    nn = NeuralNetwork(11, 32, 1, 2, "R", decay=0, learning_rate=0.005)
+    nn.train(X_train, y_train, epochs=1000, batch_size=1024, print_every=100, validation_data=(X_test, y_test))
+
+    print()
 
 
 # noinspection PyPep8Naming
@@ -40,6 +42,6 @@ def train_forest_fires():
 
 
 # train_heart_disease()
-train_fashion_mnist()
+# train_fashion_mnist()
 # train_forest_fires()
-# train_wine_quality()
+train_wine_quality()

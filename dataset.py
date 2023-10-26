@@ -26,6 +26,7 @@ def get_dataframes_wine_quality():
     # data (as pandas dataframes)
     X = wine_quality.data.features
     y = wine_quality.data.targets
+    print(X)
     return X, y
 
 

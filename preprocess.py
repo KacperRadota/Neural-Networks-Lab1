@@ -21,7 +21,7 @@ def get_train_and_test_datasets_heart_disease():
 def get_train_and_test_datasets_wine_quality():
     X, y = get_dataframes_wine_quality()
     X_normalised = (2 * (X - X.min()) / (X.max() - X.min())) - 1
-    y_normalised = (2 * (y - y.min()) / (y.max() - y.min())) - 1
+    y_normalised = y / 10
     X_train, X_test, y_trainP, y_testP = train_test_split(X_normalised, y_normalised, test_size=0.2, shuffle=True)
     X_train = X_train.to_numpy()
     X_test = X_test.to_numpy()
