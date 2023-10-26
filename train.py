@@ -16,10 +16,8 @@ def train_heart_disease(batch_size=40):
 # noinspection PyPep8Naming
 def train_wine_quality():
     X_train, X_test, y_train, y_test = get_train_and_test_datasets_wine_quality()
-    nn = NeuralNetwork(11, 32, 1, 2, "R", decay=0, learning_rate=0.005)
-    nn.train(X_train, y_train, epochs=1000, batch_size=1024, print_every=100, validation_data=(X_test, y_test))
-
-    print()
+    nn = NeuralNetwork(11, 32, 1, 2, "R", decay=0, learning_rate=0.005, accuracy_precision=0.1)
+    nn.train(X_train, y_train, epochs=1000, batch_size=1024, print_every=1, validation_data=(X_test, y_test))
 
 
 # noinspection PyPep8Naming

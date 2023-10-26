@@ -4,10 +4,10 @@ import numpy as np
 import pandas.core.frame
 
 
-# noinspection PyPep8Naming,DuplicatedCode
+# noinspection PyPep8Naming,DuplicatedCode,PyUnboundLocalVariable
 class NeuralNetwork:
     def __init__(self, input_dim, hidden_dim, output_dim, num_hidden_layers, classification_or_regression="C",
-                 learning_rate=0.005, decay=5e-6):
+                 learning_rate=0.005, decay=5e-6, accuracy_precision=None):
         self.plot_counter = 1
         self.loss_plot_vals = []
         self.lr_plot_vals = []
@@ -30,6 +30,7 @@ class NeuralNetwork:
             self.loss = LossMeanSquaredError()
             self.layers.append(ActivationLinear())
             self.accuracy = AccuracyRegression()
+            self.accuracy.precision = accuracy_precision
         self.trainable_layers = []
         for i in range(len(self.layers)):
             if i == 0:

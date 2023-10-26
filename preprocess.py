@@ -27,7 +27,6 @@ def get_train_and_test_datasets_wine_quality():
     X_test = X_test.to_numpy()
     y_train = y_trainP.to_numpy()
     y_test = y_testP.to_numpy()
-    print(y_normalised)
     return X_train, X_test, y_train, y_test
 
 
