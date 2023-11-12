@@ -39,6 +39,8 @@ def download_and_prepare_fashion_mnist_file():
     folder = 'data/raw/fashion_mnist_images'
     if not os.path.isfile(file):
         print(f'Downloading {url} and saving as {file}...')
+    else:
+        print('ZIP file found')
     urllib.request.urlretrieve(url, file)
     print('Unzipping images...')
     with ZipFile(file) as zip_images:
