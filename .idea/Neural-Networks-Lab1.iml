@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/data/processed/fashion_mnist_datasets" />
       <excludeFolder url="file://$MODULE_DIR$/venvi" />
+      <excludeFolder url="file://$MODULE_DIR$/data/created_datasets" />
+      <excludeFolder url="file://$MODULE_DIR$/data/trained_models" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

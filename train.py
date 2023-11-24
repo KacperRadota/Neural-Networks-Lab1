@@ -1,4 +1,7 @@
 # Training loop
+import os
+import pickle
+
 import numpy as np
 
 from model import NeuralNetwork
@@ -19,6 +22,33 @@ def train_fashion_mnist():
     nn = NeuralNetwork(784, 64, 10, 2, "C", decay=5e-5)
     nn.train(X_train, y_train, validation_data=(X_test, y_test), epochs=5, batch_size=128, print_every=100,
              show_plots=True)
+    # print('Serializing model to file')
+    # file_name = 'original_data_model'
+    # models_folder = os.path.join('data', 'trained_models')
+    # if not os.path.exists(models_folder):
+    #     os.makedirs(models_folder)
+    # file_path = os.path.join(models_folder, file_name)
+    # with open(file_path, 'wb') as file:
+    #     pickle.dump(nn, file)
+
+
+# noinspection PyPep8Naming
+def train_fashion_mnist_with_data_from_autoencoder_model():
+    _, X_test, y_train, y_test = get_train_and_test_datasets_fashion_mnist()
+    folder = os.path.join('data', 'created_datasets', 'X_train_from_model')
+    with open(folder, 'rb') as pickle_file:
+        X_train = pickle.load(pickle_file)
+    nn = NeuralNetwork(784, 64, 10, 2, "C", decay=5e-5)
+    nn.train(X_train, y_train, validation_data=(X_test, y_test), epochs=5, batch_size=128, print_every=100,
+             show_plots=True)
+    print('Serializing model to file')
+    file_name = 'created_dataset_model'
+    models_folder = os.path.join('data', 'trained_models')
+    if not os.path.exists(models_folder):
+        os.makedirs(models_folder)
+    file_path = os.path.join(models_folder, file_name)
+    with open(file_path, 'wb') as file:
+        pickle.dump(nn, file)
 
 
 # noinspection PyPep8Naming
@@ -54,10 +84,14 @@ def train(which_one: int):
 
 
 if __name__ == "__main__":
-    which_one = int(input("Which data set you want to train?\n"
-                          "1 - Heart Disease (Classification, interpretable)\n"
-                          "2 - Fashion MNIST (Classification, non-interpretable)\n"
-                          "3 - Forest Fires (Regression, interpretable)\n"
-                          "4 - Wine Quality (Regression, interpretable)\n\n"
-                          "Input number: "))
-    train(which_one)
+    print("=== Program started ===")
+    # which_one = int(input("Which data set you want to train?\n"
+    #                       "1 - Heart Disease (Classification, interpretable)\n"
+    #                       "2 - Fashion MNIST (Classification, non-interpretable)\n"
+    #                       "3 - Forest Fires (Regression, interpretable)\n"
+    #                       "4 - Wine Quality (Regression, interpretable)\n\n"
+    #                       "Input number: "))
+    # train(which_one)
+    # train_fashion_mnist_with_data_from_autoencoder_model()
+    train_fashion_mnist()
+    print("=== Program ended ===")

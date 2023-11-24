@@ -159,3 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 /data/processed/fashion_mnist_datasets/
+/data/trained_models/
+/data/created_datasets/
